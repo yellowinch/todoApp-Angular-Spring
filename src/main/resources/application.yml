@@ -1,0 +1,18 @@
+
+spring:
+  flyway:
+    enabled: true
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        order_inserts: true
+        jdbc:
+          batch_size: 100
+        show_sql: true
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+  datasource:
+      url: jdbc:postgresql://localhost:5432/todoapp
+      password: 123456

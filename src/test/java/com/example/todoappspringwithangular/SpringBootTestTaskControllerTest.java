@@ -15,7 +15,7 @@ class SpringBootTestTaskControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
     @Test
-    void should_return_empty_task_list() {
+    void should_return_empty_task_list_when () {
         final var responseEntity = restTemplate.getForEntity("/tasks", List.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
