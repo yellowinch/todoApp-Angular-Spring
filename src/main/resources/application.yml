@@ -11,8 +11,8 @@ spring:
           batch_size: 100
         show_sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     open-in-view: false
   datasource:
-      url: jdbc:postgresql://localhost:5432/todoapp
+      url: jdbc:postgresql://localhost:5432/postgres
       password: 123456
