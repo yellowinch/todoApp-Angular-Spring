@@ -1,5 +1,6 @@
 package com.example.todoappspringwithangular;
 
+import com.example.todoappspringwithangular.entity.Task;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

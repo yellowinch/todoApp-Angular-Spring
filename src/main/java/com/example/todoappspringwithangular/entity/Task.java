@@ -1,7 +1,8 @@
-package com.example.todoappspringwithangular;
+package com.example.todoappspringwithangular.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name="tasks")
 @Builder
+@Data
 public class Task {
 
     @Id
@@ -35,6 +37,11 @@ public class Task {
     private LocalDateTime createdTime;
 
     @LastModifiedDate
-    @Column(name = "modified_at", columnDefinition = "timestamp not null default current_timestamp")
+    @Column(name = "modified_at", nullable = false)
     private LocalDateTime updateTime;
+
+    public Task(String name, boolean completed) {
+        this.name=name;
+        this.completed=completed;
+    }
 }

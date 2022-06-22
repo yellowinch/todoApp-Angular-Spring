@@ -1,5 +1,7 @@
-package com.example.todoappspringwithangular;
+package com.example.todoappspringwithangular.controller;
 
+import com.example.todoappspringwithangular.entity.Task;
+import com.example.todoappspringwithangular.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,12 +18,6 @@ import java.util.List;
 public class TaskController {
 
     private final TaskService taskService;
-
-    @GetMapping("/test")
-    @ResponseStatus(HttpStatus.OK)
-    public String fetchTest(){
-        return "test";
-    }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
