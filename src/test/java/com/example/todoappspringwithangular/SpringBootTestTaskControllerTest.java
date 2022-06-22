@@ -1,6 +1,7 @@
 package com.example.todoappspringwithangular;
 
 import com.example.todoappspringwithangular.entity.Task;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
@@ -26,6 +27,11 @@ class SpringBootTestTaskControllerTest {
     private TestRestTemplate restTemplate;
     @Autowired
     private JacksonTester<List<Task>> json;
+    @AfterEach
+     void clearAllTasks(){
+        taskRepository.deleteAll();
+    }
+
     @Test
     void should_return_empty_task_list () {
         final var responseEntity = restTemplate.getForEntity("/tasks", List.class);
@@ -44,5 +50,17 @@ class SpringBootTestTaskControllerTest {
         assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         final var fetchedTasks = responseEntity.getBody();
         assertThat(json.parseObject(fetchedTasks)).isEqualTo(tasks);
+    }
+
+    @Test
+    void should_return_created_task_when_add_task_given_valid_parameter() {
+        final Task newTask = new Task("task 01", false);
+        final ResponseEntity<Task> responseEntity = restTemplate.postForEntity("/tasks", newTask, Task.class);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        final Task createdTask = responseEntity.getBody();
+        assertThat(createdTask).isNotNull();
+        assertThat(createdTask.getName()).isEqualTo(newTask.getName());
+        assertThat(createdTask.getCompleted()).isEqualTo(newTask.getCompleted());
     }
 }
