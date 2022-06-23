@@ -8,9 +8,7 @@ import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
@@ -53,7 +51,7 @@ class SpringBootTestTaskControllerTest {
     }
 
     @Test
-    void should_return_created_task_when_add_task_given_valid_parameter() {
+    void should_return_created_task_when_add_task_given_valid_request_body() {
         final Task newTask = new Task("task 01", false);
         final ResponseEntity<Task> responseEntity = restTemplate.postForEntity("/tasks", newTask, Task.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -62,5 +60,26 @@ class SpringBootTestTaskControllerTest {
         assertThat(createdTask).isNotNull();
         assertThat(createdTask.getName()).isEqualTo(newTask.getName());
         assertThat(createdTask.getCompleted()).isEqualTo(newTask.getCompleted());
+    }
+
+    @Test
+    void should_return_updated_task_when_modify_task_given_valid_id_and_request_body() {
+        final var task = new Task("task 01", false);
+        taskRepository.save(task);
+        final var editedTask = new Task("new task", true);
+        String url = "/tasks/" + task.getId();
+        String reqJsonStr = "{\"name\":\"new task\", \"completed\":true}";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(reqJsonStr, headers);
+        ResponseEntity<Task> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity, Task.class);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        final var updatedTask = responseEntity.getBody();
+        assertThat(updatedTask).isNotNull()
+                        .hasFieldOrPropertyWithValue("id",task.getId())
+                        .hasFieldOrPropertyWithValue("name",editedTask.getName())
+                        .hasFieldOrPropertyWithValue("completed",editedTask.getCompleted());
     }
 }

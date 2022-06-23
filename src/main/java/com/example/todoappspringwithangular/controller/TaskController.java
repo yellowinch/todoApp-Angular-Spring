@@ -1,12 +1,14 @@
 package com.example.todoappspringwithangular.controller;
 
+import com.example.todoappspringwithangular.entity.RequestTaskBody;
 import com.example.todoappspringwithangular.entity.Task;
 import com.example.todoappspringwithangular.TaskService;
-import com.example.todoappspringwithangular.entity.TaskName;
+import com.example.todoappspringwithangular.entity.RequestTaskName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -25,8 +27,15 @@ public class TaskController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Task addTask(@RequestBody TaskName taskName){
-        return taskService.addTask(new Task(taskName.getName(),false));
+    public Task addTask(@RequestBody RequestTaskName requestTaskName){
+        return taskService.addTask(new Task(requestTaskName.getName(),false));
+    }
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Task updateTask(
+            @PathVariable(value = "id")Long id,
+            @Valid @RequestBody RequestTaskBody taskBody){
+        return taskService.modifyTask(id,new Task(taskBody.getName(), taskBody.getCompleted()));
     }
 
 }

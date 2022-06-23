@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaskName {
+public class RequestTaskBody {
     private String name;
+    private Boolean completed;
 }

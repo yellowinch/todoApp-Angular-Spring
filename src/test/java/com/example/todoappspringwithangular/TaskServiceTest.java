@@ -41,4 +41,15 @@ class TaskServiceTest {
                 .isEqualTo(tasks);
         verify(taskRepository).findAll();
     }
+
+    @Test
+    void should_return_created_task_when_add_task_given_valid_request_body() {
+        final var newTask = new Task("task 01", false);
+        when(taskRepository.save(newTask)).thenReturn(newTask);
+        final Task createdTask = taskService.addTask(newTask);
+        assertThat(createdTask).isNotNull()
+                .hasFieldOrPropertyWithValue("name",newTask.getName())
+                .hasFieldOrPropertyWithValue("completed",newTask.getCompleted());
+        verify(taskRepository).save(newTask);
+    }
 }
