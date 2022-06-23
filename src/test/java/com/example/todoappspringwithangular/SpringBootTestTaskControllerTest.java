@@ -1,6 +1,7 @@
 package com.example.todoappspringwithangular;
 
 import com.example.todoappspringwithangular.dto.Task;
+import com.example.todoappspringwithangular.repository.TaskRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,6 @@ class SpringBootTestTaskControllerTest {
         final Task newTask = new Task("task 01", false);
         final ResponseEntity<Task> responseEntity = restTemplate.postForEntity("/tasks", newTask, Task.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         final Task createdTask = responseEntity.getBody();
         assertThat(createdTask).isNotNull();
         assertThat(createdTask.getName()).isEqualTo(newTask.getName());
@@ -75,16 +75,19 @@ class SpringBootTestTaskControllerTest {
         ResponseEntity<Task> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity, Task.class);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-        final var updatedTask = responseEntity.getBody();
-        assertThat(updatedTask).isNotNull()
-                        .hasFieldOrPropertyWithValue("id",task.getId())
-                        .hasFieldOrPropertyWithValue("name",editedTask.getName())
-                        .hasFieldOrPropertyWithValue("completed",editedTask.getCompleted());
+        assertThat(responseEntity.getBody()).isNull();
     }
 
-//    @Test
-//    void should_remove_task_when_delete_task_given_valid_task_id() {
-//
-//    }
+    @Test
+    void should_remove_task_when_delete_task_given_valid_task_id() {
+        final var task1 = new Task("task 01", true);
+        final var task2 = new Task("task 02", false);
+        final var tasks = List.of(task1, task2);
+        taskRepository.saveAll(tasks);
+        String url = "/tasks/" + task1.getId();
+        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(responseEntity.getBody()).isNull();
+    }
 }

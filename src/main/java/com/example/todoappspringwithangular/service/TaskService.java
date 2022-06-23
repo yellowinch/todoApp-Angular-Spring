@@ -1,5 +1,6 @@
-package com.example.todoappspringwithangular;
+package com.example.todoappspringwithangular.service;
 
+import com.example.todoappspringwithangular.repository.TaskRepository;
 import com.example.todoappspringwithangular.dto.Task;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -7,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import javax.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,13 +23,18 @@ public class TaskService {
      return taskRepository.save(newTask);
     }
     @Transactional
-    public Task modifyTask(Long id,Task modifiedTask) {
-        final LocalDateTime createdTime = findTaskById(id).getCreatedTime();
-        return taskRepository.update(id,modifiedTask.getName(),modifiedTask.getCompleted(),createdTime);
+    public void modifyTask(Long id,Task modifiedTask) {
+         findTaskById(id);
+        taskRepository.update(modifiedTask.getName(),modifiedTask.getCompleted(),id);
     }
     @Transactional
     public Task findTaskById(Long id) {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Task Not Found"));
+    }
+    @Transactional
+    public void deleteTaskById(Long id) {
+         findTaskById(id);
+         taskRepository.deleteById(id);
     }
 }

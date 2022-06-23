@@ -2,7 +2,7 @@ package com.example.todoappspringwithangular.controller;
 
 import com.example.todoappspringwithangular.dto.RequestTaskBody;
 import com.example.todoappspringwithangular.dto.Task;
-import com.example.todoappspringwithangular.TaskService;
+import com.example.todoappspringwithangular.service.TaskService;
 import com.example.todoappspringwithangular.dto.RequestTaskName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,10 +32,16 @@ public class TaskController {
     }
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Task updateTask(
+    public void updateTask(
             @PathVariable(value = "id")Long id,
             @Valid @RequestBody RequestTaskBody taskBody){
-        return taskService.modifyTask(id,new Task(taskBody.getName(), taskBody.getCompleted()));
+         taskService.modifyTask(id,new Task(taskBody.getName(), taskBody.getCompleted()));
     }
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeTask(@PathVariable(value = "id") Long id){
+        taskService.deleteTaskById(id);
+    }
+
 
 }
