@@ -1,6 +1,5 @@
 package com.example.todoappspringwithangular;
 
-import com.example.todoappspringwithangular.dto.RequestTaskBody;
 import com.example.todoappspringwithangular.dto.Task;
 import com.example.todoappspringwithangular.repository.TaskRepository;
 import org.junit.jupiter.api.Test;
@@ -8,13 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.persistence.EntityManager;
-
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
