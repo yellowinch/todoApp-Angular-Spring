@@ -1,9 +1,9 @@
 package com.example.todoappspringwithangular.controller;
 
-import com.example.todoappspringwithangular.entity.RequestTaskBody;
-import com.example.todoappspringwithangular.entity.Task;
+import com.example.todoappspringwithangular.dto.RequestTaskBody;
+import com.example.todoappspringwithangular.dto.Task;
 import com.example.todoappspringwithangular.TaskService;
-import com.example.todoappspringwithangular.entity.RequestTaskName;
+import com.example.todoappspringwithangular.dto.RequestTaskName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

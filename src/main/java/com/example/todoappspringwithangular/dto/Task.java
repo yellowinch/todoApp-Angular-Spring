@@ -1,4 +1,4 @@
-package com.example.todoappspringwithangular.entity;
+package com.example.todoappspringwithangular.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

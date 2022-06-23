@@ -1,6 +1,6 @@
 package com.example.todoappspringwithangular;
 
-import com.example.todoappspringwithangular.entity.Task;
+import com.example.todoappspringwithangular.dto.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,4 +82,9 @@ class SpringBootTestTaskControllerTest {
                         .hasFieldOrPropertyWithValue("name",editedTask.getName())
                         .hasFieldOrPropertyWithValue("completed",editedTask.getCompleted());
     }
+
+//    @Test
+//    void should_remove_task_when_delete_task_given_valid_task_id() {
+//
+//    }
 }

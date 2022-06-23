@@ -1,14 +1,16 @@
 package com.example.todoappspringwithangular;
 
-import com.example.todoappspringwithangular.entity.Task;
+import com.example.todoappspringwithangular.dto.Task;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -51,5 +53,24 @@ class TaskServiceTest {
                 .hasFieldOrPropertyWithValue("name",newTask.getName())
                 .hasFieldOrPropertyWithValue("completed",newTask.getCompleted());
         verify(taskRepository).save(newTask);
+    }
+
+    @Test
+    void should_return_updated_task_when_modify_task_given_valid_id() {
+        final Task oldTask = new Task(1L,"old task", false,LocalDateTime.now(),LocalDateTime.now());
+         taskRepository.save(oldTask);
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(oldTask));
+        final String updatedTaskName = "updated Task";
+        final boolean updatedTaskState = true;
+        when(taskRepository
+                .update(oldTask.getId(),updatedTaskName,updatedTaskState,oldTask.getCreatedTime()))
+                .thenReturn(new Task(oldTask.getId(),updatedTaskName,updatedTaskState,
+                        oldTask.getCreatedTime(),LocalDateTime.now()));
+        final Task updatedTask = taskService.modifyTask(oldTask.getId(), new Task(updatedTaskName, updatedTaskState));
+        assertThat(updatedTask).isNotNull()
+                .hasFieldOrPropertyWithValue("name","updated Task")
+                .hasFieldOrPropertyWithValue("completed",true)
+                .hasFieldOrPropertyWithValue("createdTime",oldTask.getCreatedTime());
+        assertThat(updatedTask.getUpdateTime()).isNotEqualTo(oldTask.getUpdateTime());
     }
 }
