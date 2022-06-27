@@ -1,9 +1,8 @@
 package com.example.todoappspringwithangular.controller;
 
-import com.example.todoappspringwithangular.dto.RequestTaskBody;
+import com.example.todoappspringwithangular.dto.TaskDto;
 import com.example.todoappspringwithangular.dto.Task;
 import com.example.todoappspringwithangular.service.TaskService;
-import com.example.todoappspringwithangular.dto.RequestTaskName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -27,15 +26,15 @@ public class TaskController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Task addTask(@RequestBody RequestTaskName requestTaskName){
-        return taskService.addTask(new Task(requestTaskName.getName(),false));
+    public Task addTask(@RequestBody TaskDto task){
+        return taskService.addTask(task);
     }
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void updateTask(
             @PathVariable(value = "id")Long id,
-            @Valid @RequestBody RequestTaskBody taskBody){
-         taskService.modifyTask(id,new Task(taskBody.getName(), taskBody.getCompleted()));
+            @Valid @RequestBody TaskDto task){
+         taskService.modifyTask(id,task);
     }
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

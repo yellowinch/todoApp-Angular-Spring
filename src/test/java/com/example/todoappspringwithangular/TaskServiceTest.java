@@ -1,6 +1,7 @@
 package com.example.todoappspringwithangular;
 
 import com.example.todoappspringwithangular.dto.Task;
+import com.example.todoappspringwithangular.dto.TaskDto;
 import com.example.todoappspringwithangular.repository.TaskRepository;
 import com.example.todoappspringwithangular.service.TaskService;
 import org.junit.jupiter.api.Test;
@@ -50,7 +51,7 @@ class TaskServiceTest {
     void should_return_created_task_when_add_task_given_valid_request_body() {
         final var newTask = new Task("task 01", false);
         when(taskRepository.save(newTask)).thenReturn(newTask);
-        final Task createdTask = taskService.addTask(newTask);
+        final Task createdTask = taskService.addTask(TaskDto.builder().name(newTask.getName()).completed(false).build());
         assertThat(createdTask).isNotNull()
                 .hasFieldOrPropertyWithValue("name",newTask.getName())
                 .hasFieldOrPropertyWithValue("completed",newTask.getCompleted());
@@ -62,7 +63,7 @@ class TaskServiceTest {
         final Task oldTask = new Task(1L,"old task", false,LocalDateTime.now(),LocalDateTime.now());
         taskRepository.save(oldTask);
         when(taskRepository.findById(1L)).thenReturn(Optional.of(oldTask));
-        taskService.modifyTask(1L, new Task("new Task",true));
+        taskService.modifyTask(1L, new TaskDto("new Task",true));
         final Task updatedTask = taskService.findTaskById(oldTask.getId());
         assertThat(updatedTask).isNotNull();
         verify(taskRepository).update("new Task",true,1L);

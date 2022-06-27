@@ -1,5 +1,7 @@
 package com.example.todoappspringwithangular.service;
 
+import com.example.todoappspringwithangular.dto.TaskDto;
+import com.example.todoappspringwithangular.exception.NotFoundException;
 import com.example.todoappspringwithangular.repository.TaskRepository;
 import com.example.todoappspringwithangular.dto.Task;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +21,17 @@ public class TaskService {
         return taskRepository.findAll();
     }
     @Transactional
-    public Task addTask(Task newTask) {
-     return taskRepository.save(newTask);
+    public Task addTask(TaskDto createdTask) {
+     return taskRepository.save(Task.builder().name(createdTask.getName()).completed(false).build());
     }
     @Transactional
-    public void modifyTask(Long id,Task modifiedTask) {
-         findTaskById(id);
-        taskRepository.update(modifiedTask.getName(),modifiedTask.getCompleted(),id);
+    public void modifyTask(Long id, TaskDto modifiedTask){
+        if(findTaskById(id)!=null) {
+            findTaskById(id);
+            taskRepository.update(modifiedTask.getName(), modifiedTask.getCompleted(), id);
+        }else {
+            throw new NotFoundException("Task not Found");
+        }
     }
     @Transactional
     public Task findTaskById(Long id) {
