@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @AutoConfigureJsonTesters
@@ -26,13 +27,14 @@ class SpringBootTestTaskControllerTest {
     private TestRestTemplate restTemplate;
     @Autowired
     private JacksonTester<List<Task>> json;
+
     @AfterEach
-     void clearAllTasks(){
+    void clearAllTasks() {
         taskRepository.deleteAll();
     }
 
     @Test
-    void should_return_empty_task_list () {
+    void should_return_empty_task_list() {
         final var responseEntity = restTemplate.getForEntity("/tasks", List.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
@@ -63,16 +65,15 @@ class SpringBootTestTaskControllerTest {
     }
 
     @Test
-    void should_return_updated_task_when_modify_task_given_valid_id_and_request_body() {
+    void should_updated_task_when_modify_task_given_valid_id_and_request_body() {
         final var task = new Task("task 01", false);
         taskRepository.save(task);
-        final var editedTask = new Task("new task", true);
         String url = "/tasks/" + task.getId();
         String reqJsonStr = "{\"name\":\"new task\", \"completed\":true}";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(reqJsonStr, headers);
-        ResponseEntity<Task> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity, Task.class);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isNull();
@@ -85,9 +86,56 @@ class SpringBootTestTaskControllerTest {
         final var tasks = List.of(task1, task2);
         taskRepository.saveAll(tasks);
         String url = "/tasks/" + task1.getId();
+        System.out.println("id" + task1.getId());
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(responseEntity.getBody()).isNull();
     }
+
+    @Test
+    void should_throw_not_found_exception_message_delete_task_given_valid_task_id() {
+        final var task1 = new Task("task 01", true);
+        final var task2 = new Task("task 02", false);
+        final var tasks = List.of(task1, task2);
+        taskRepository.saveAll(tasks);
+        String url = "/tasks/11";
+        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(responseEntity.getBody()).contains("Not Found");
+    }
+
+    @Test
+    void should_throw_bad_request_exception_when_update_task_given_invalid_request_parameter() {
+        final var task = new Task("task 01", false);
+        taskRepository.save(task);
+        String url = "/tasks/" + task.getId();
+
+        String reqJsonStr = "{\"name1\":\"new task\", \"completed\":true}";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(reqJsonStr, headers);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(responseEntity.getBody()).contains("Bad Request");
+    }
+
+    @Test
+    void should_throw_not_found_exception_when_update_task_given_invalid_request_parameter() {
+        final var task = new Task("task 01", false);
+        taskRepository.save(task);
+        String url = "/tasks/11";
+
+        String reqJsonStr = "{\"name\":\"new task\", \"completed\":true}";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(reqJsonStr, headers);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(responseEntity.getBody()).contains("Not Found");
+    }
+
 }

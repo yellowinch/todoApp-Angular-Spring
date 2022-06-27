@@ -2,6 +2,7 @@ package com.example.todoappspringwithangular;
 
 import com.example.todoappspringwithangular.dto.Task;
 import com.example.todoappspringwithangular.dto.TaskDto;
+import com.example.todoappspringwithangular.exception.NotFoundException;
 import com.example.todoappspringwithangular.repository.TaskRepository;
 import com.example.todoappspringwithangular.service.TaskService;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -26,6 +28,7 @@ class TaskServiceTest {
     private TaskRepository taskRepository;
     @InjectMocks
     private TaskService taskService;
+
     @Test
     void should_return_empty_list_when_find_tasks_given_repo_is_empty() {
         when(taskRepository.findAll()).thenReturn(Collections.emptyList());
@@ -53,21 +56,36 @@ class TaskServiceTest {
         when(taskRepository.save(newTask)).thenReturn(newTask);
         final Task createdTask = taskService.addTask(TaskDto.builder().name(newTask.getName()).completed(false).build());
         assertThat(createdTask).isNotNull()
-                .hasFieldOrPropertyWithValue("name",newTask.getName())
-                .hasFieldOrPropertyWithValue("completed",newTask.getCompleted());
+                .hasFieldOrPropertyWithValue("name", newTask.getName())
+                .hasFieldOrPropertyWithValue("completed", newTask.getCompleted());
         verify(taskRepository).save(newTask);
     }
 
     @Test
     void should_return_updated_task_when_modify_task_given_valid_id() {
-        final Task oldTask = new Task(1L,"old task", false,LocalDateTime.now(),LocalDateTime.now());
-        taskRepository.save(oldTask);
+        final Task oldTask = new Task(1L, "old task", false, LocalDateTime.now(), LocalDateTime.now());
         when(taskRepository.findById(1L)).thenReturn(Optional.of(oldTask));
-        taskService.modifyTask(1L, new TaskDto("new Task",true));
+        taskService.modifyTask(1L, new TaskDto("new Task", true));
         final Task updatedTask = taskService.findTaskById(oldTask.getId());
         assertThat(updatedTask).isNotNull();
-        verify(taskRepository).update("new Task",true,1L);
+        verify(taskRepository).update("new Task", true, 1L);
     }
 
+    @Test
+    void should_throw_exception_when_modify_task_given_invalid_id() {
+        when(taskRepository.findById(12L)).thenReturn(Optional.empty());
+        TaskDto taskDto = TaskDto.builder().build();
+
+        assertThrows(NotFoundException.class, () -> taskService.modifyTask(12L, taskDto));
+
+    }
+
+    @Test
+    void should_throw_exception_when_delete_task_given_invalid_id() {
+        when(taskRepository.findById(12L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> taskService.deleteTaskById(12L));
+
+    }
 
 }
