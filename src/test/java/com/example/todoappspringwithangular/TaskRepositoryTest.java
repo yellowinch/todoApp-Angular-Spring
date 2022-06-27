@@ -56,12 +56,17 @@ class TaskRepositoryTest {
     void should_remove_task_when_delete_task_given_valid_id() {
         final Task task = new Task("old task", false);
         taskRepository.save(task);
-        final List<Task> beforeRemoveTask = taskRepository.findAll();
-        assertThat(beforeRemoveTask).isNotNull()
-                .hasSize(1);
         taskRepository.deleteById(task.getId());
         final List<Task> afterRemoveTask = taskRepository.findAll();
         assertThat(afterRemoveTask).isEmpty();
     }
 
+    @Test
+    void should_return_right_task_when_find_test_by_id_given_valid_id() {
+        final Task task = new Task("task 01", false);
+        taskRepository.save(task);
+        final Task fetchedTask = taskRepository.findById(task.getId()).orElse(null);
+        assertThat(fetchedTask).isNotNull();
+        assertThat(task.getId()).isEqualTo(fetchedTask.getId());
+    }
 }
